@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/BalalaikaTracker/static/css/main.4d577064.css",
+    "main.js": "/BalalaikaTracker/static/js/main.69d1d099.js",
+    "static/js/787.5ff89c17.chunk.js": "/BalalaikaTracker/static/js/787.5ff89c17.chunk.js",
+    "service-worker.js": "/BalalaikaTracker/service-worker.js",
+    "index.html": "/BalalaikaTracker/index.html",
+    "main.4d577064.css.map": "/BalalaikaTracker/static/css/main.4d577064.css.map",
+    "main.69d1d099.js.map": "/BalalaikaTracker/static/js/main.69d1d099.js.map",
+    "787.5ff89c17.chunk.js.map": "/BalalaikaTracker/static/js/787.5ff89c17.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4d577064.css",
+    "static/js/main.69d1d099.js"
+  ]
+}
