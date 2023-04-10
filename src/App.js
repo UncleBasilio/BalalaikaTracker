@@ -122,7 +122,7 @@ function App() {
       );
       snd.play();
     }
-    setAlarmInterval(setInterval(beep, 5000));
+    setAlarmInterval(setInterval(beep, 600000));
   }
   function stopTimer() {
     if (!startTime) {
