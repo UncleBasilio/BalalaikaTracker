@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/BalalaikaTracker/static/css/main.4d577064.css",
-    "main.js": "/BalalaikaTracker/static/js/main.c8358dce.js",
+    "main.css": "/BalalaikaTracker/static/css/main.9a3d10b4.css",
+    "main.js": "/BalalaikaTracker/static/js/main.9fc6b1d9.js",
     "static/js/787.5ff89c17.chunk.js": "/BalalaikaTracker/static/js/787.5ff89c17.chunk.js",
     "service-worker.js": "/BalalaikaTracker/service-worker.js",
     "index.html": "/BalalaikaTracker/index.html",
-    "main.4d577064.css.map": "/BalalaikaTracker/static/css/main.4d577064.css.map",
-    "main.c8358dce.js.map": "/BalalaikaTracker/static/js/main.c8358dce.js.map",
+    "main.9a3d10b4.css.map": "/BalalaikaTracker/static/css/main.9a3d10b4.css.map",
+    "main.9fc6b1d9.js.map": "/BalalaikaTracker/static/js/main.9fc6b1d9.js.map",
     "787.5ff89c17.chunk.js.map": "/BalalaikaTracker/static/js/787.5ff89c17.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4d577064.css",
-    "static/js/main.c8358dce.js"
+    "static/css/main.9a3d10b4.css",
+    "static/js/main.9fc6b1d9.js"
   ]
 }
