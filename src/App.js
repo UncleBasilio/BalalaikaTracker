@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import React, { useEffect, useState, useRef } from "react";
+import { Button, ButtonGroup } from "react-bootstrap";
 import "./App.css";
 import { useBeforeunload } from "react-beforeunload";
 
@@ -42,13 +42,12 @@ function Stats({ stats, period, title, startTime, currentTime }) {
     }
   }
   const total = Object.values(statsInPeriod).reduce((a, b) => a + b, 0);
-  if (startTime)
-  {
+  if (startTime) {
     return (
       <div>
-        {title}: {formatTimeDelta(total+(currentTime-startTime), false)}
+        {title}: {formatTimeDelta(total + (currentTime - startTime), false)}
       </div>
-    );   
+    );
   }
   return (
     <div>
@@ -77,12 +76,12 @@ function getThisWeekPeriod() {
   const start = new Date(
     today.getFullYear(),
     today.getMonth(),
-    today.getDate() - today.getDay()
+    today.getDate() - ((today.getDay() + 6) % 7)
   );
   const end = new Date(
     today.getFullYear(),
     today.getMonth(),
-    today.getDate() + 7 - today.getDay()
+    today.getDate() + 7 - ((today.getDay() + 6) % 7)
   );
   return [start, end];
 }
@@ -170,17 +169,70 @@ function App() {
   }
   // Все свойства кнопки "Старт"
   const startButton = (
-    <Button variant="secondary" style={{backgroundColor:"#8CC152" }} onClick={startTimer}>
+    <Button variant="success" size="lg" onClick={startTimer}>
       Старт
     </Button>
   );
   // Все свойства кнопки "Стоп"
   const stopButton = (
-    <Button variant="success" style={{backgroundColor:"#E9573F" }} onClick={stopTimer}>
+    <Button variant="danger" size="lg" onClick={stopTimer}>
       Стоп
     </Button>
   );
+  const exportStats = () => {
+    const statsString = JSON.stringify(stats);
+    const blob = new Blob([statsString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "stats.json");
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  const openImportPrompt = () => {
+    inputFile.current.click();
+  };
+  const importStats = () => {
+    const file = inputFile.current.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const loadedStats = JSON.parse(e.target.result);
+      if (
+        window.confirm(
+          "Вы уверены, что хотите импортировать статистику? Все текущие данные будут утеряны!"
+        )
+      ) {
+        saveStats(loadedStats);
+      }
+    };
+    reader.readAsText(file);
+  };
+  const makeReport = () => {
+    const report = Object.keys(stats)
+      .filter((key) => {
+        const date = new Date(Number(key));
+        const today = new Date();
+        return (
+          date >=
+          new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30)
+        );
+      })
+      .map((key) => {
+        const date = new Date(Number(key));
+        const hours = Math.floor(stats[key] / 3600000);
+        const minutes = Math.round((stats[key] % 3600000) / 60000);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${hours} часов ${minutes} минут`;
+      })
+      .join("\n");
+    navigator.share({
+      title: "Отчёт",
+      text: report,
+    });
+  };
 
+  const inputFile = useRef(null);
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(null);
   const [tickInterval, setTickInterval] = useState(null);
@@ -191,21 +243,65 @@ function App() {
   }, []);
   useBeforeunload(stopTimer);
   return (
-    <div className="container">
+    <div className="container d-flex flex-column justify-content-between vh-100">
       <div className="d-flex flex-column align-items-center justify-content-center">
         <Timer startTime={startTime} currentTime={currentTime} />
         {startTime ? stopButton : startButton}
 
-        <Stats period={getTodayPeriod()} stats={stats} title="Сегодня" startTime={startTime} currentTime={currentTime} />
+        <Stats
+          period={getTodayPeriod()}
+          stats={stats}
+          title="Сегодня"
+          startTime={startTime}
+          currentTime={currentTime}
+        />
         <Stats
           period={getLast7DaysPeriod()}
           stats={stats}
           title="Последние 7 дней"
-          startTime={startTime} currentTime={currentTime}
+          startTime={startTime}
+          currentTime={currentTime}
         />
-        <Stats period={getThisWeekPeriod()} stats={stats} title="Неделя" startTime={startTime} currentTime={currentTime}/>
-        <Stats period={getThisMonthPeriod()} stats={stats} title="Месяц" startTime={startTime} currentTime={currentTime}/>
-        <Stats period={getThisYearPeriod()} stats={stats} title="Год" startTime={startTime} currentTime={currentTime}/>
+        <Stats
+          period={getThisWeekPeriod()}
+          stats={stats}
+          title="Неделя"
+          startTime={startTime}
+          currentTime={currentTime}
+        />
+        <Stats
+          period={getThisMonthPeriod()}
+          stats={stats}
+          title="Месяц"
+          startTime={startTime}
+          currentTime={currentTime}
+        />
+        <Stats
+          period={getThisYearPeriod()}
+          stats={stats}
+          title="Год"
+          startTime={startTime}
+          currentTime={currentTime}
+        />
+      </div>
+      <div>
+        <ButtonGroup className="w-100">
+          <Button variant="secondary" onClick={exportStats}>
+            Экспортировать в файл
+          </Button>
+          <Button variant="secondary" onClick={openImportPrompt}>
+            Импортировать из файла
+          </Button>
+          <Button variant="secondary" onClick={makeReport}>
+            Создать отчёт
+          </Button>
+        </ButtonGroup>
+        <input
+          type="file"
+          ref={inputFile}
+          style={{ display: "none" }}
+          onChange={importStats}
+        />
       </div>
     </div>
   );
