@@ -4,7 +4,6 @@ import "./App.css";
 import { useBeforeunload } from "react-beforeunload";
 
 const STATS_KEY = "stats";
-const BEEP_INTERVAL = 600000;
 
 function formatTimeDelta(timeDelta, needSeconds = true) {
   const hours = Math.floor(timeDelta / 1000 / 60 / 60)
@@ -118,8 +117,7 @@ function getThisYearPeriod() {
 
 function App() {
   function startTimer() {
-    const st = new Date();
-    setStartTime(st);
+    setStartTime(new Date());
     setTickInterval(
       setInterval(() => {
         setCurrentTime(new Date());
@@ -129,31 +127,9 @@ function App() {
     // Раз в 10 минут вызывавется эта пищалка. Можно поменять закодированный WAV файл
     function beep() {
       myAudio.current.play();
-      if (window.scheduler) {
-        const bi = window.debugBeepInterval || BEEP_INTERVAL;
-        const nextBeepDelay = bi - ((new Date() - st) % bi);
-        window.scheduler
-          .postTask(beep, {
-            delay: nextBeepDelay,
-            signal: window.abortTaskController.signal,
-          })
-          .catch(() => {});
-      }
     }
     // Запустили следующий цикл пищалки
-    if (window.scheduler) {
-      window.abortTaskController = new window.TaskController();
-      window.scheduler
-        .postTask(beep, {
-          delay: window.debugBeepInterval || BEEP_INTERVAL,
-          signal: window.abortTaskController.signal,
-        })
-        .catch(() => {});
-    } else {
-      setAlarmInterval(
-        setInterval(beep, window.debugBeepInterval || BEEP_INTERVAL)
-      );
-    }
+    setAlarmInterval(setInterval(beep, window.debugBeepInterval || 600000));
   }
   // Остановка таймера
   function stopTimer() {
@@ -171,12 +147,8 @@ function App() {
     saveStats(updatedStats);
     // Остановили таймер
     clearInterval(tickInterval);
-    if (window.scheduler) {
-      window.abortTaskController.abort();
-    } else {
-      // И десятиминутную пищалку тоже оствновили. Ибо нефиг
-      clearInterval(alarmInterval);
-    }
+    // И десятиминутную пищалку тоже оствновили. Ибо нефиг
+    clearInterval(alarmInterval);
   }
 
   // Подгружаем статистику из внешнего хранилища
